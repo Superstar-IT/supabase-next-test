@@ -46,7 +46,6 @@ export const signInAction = async (data: SignInWithPasswordCredentials) => {
   }
 
   revalidatePath('/', 'layout');
-  return redirect('/dashboard');
 };
 
 export const signOutAction = async () => {

@@ -17,11 +17,12 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Roles } from '@/constants/data';
+import { useUser } from '@/hooks/use-user';
 import { signUpAction } from '@/utils/supabase/actions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { useTransition } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -44,7 +45,8 @@ const formSchema = z.object({
 export type UserSignUpFormValue = z.infer<typeof formSchema>;
 
 export default function SignUpViewPage() {
-  const [loading, startTransition] = useTransition();
+  const { getCurrentUser } = useUser();
+  const [loading, setLoading] = useState(false);
 
   const defaultValues = {
     email: '',
@@ -60,7 +62,10 @@ export default function SignUpViewPage() {
   });
 
   const onSubmit = async (data: UserSignUpFormValue) => {
+    setLoading(true);
     await signUpAction(data);
+    await getCurrentUser();
+    setLoading(false);
   };
 
   return (

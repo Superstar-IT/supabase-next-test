@@ -9,10 +9,12 @@ import {
   FormMessage
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useUser } from '@/hooks/use-user';
 import { signInAction } from '@/utils/supabase/actions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -32,6 +34,9 @@ const formSchema = z.object({
 type UserFormValue = z.infer<typeof formSchema>;
 
 export default function SignInViewPage() {
+  const router = useRouter();
+  const { getCurrentUser } = useUser();
+
   const [loading, setLoading] = useState(false);
   const defaultValues = {
     email: '',
@@ -46,7 +51,9 @@ export default function SignInViewPage() {
   const onSubmit = async (data: UserFormValue) => {
     setLoading(true);
     await signInAction({ email: data.email, password: data.password });
+    await getCurrentUser();
     setLoading(false);
+    router.push('/dashboard');
   };
 
   return (

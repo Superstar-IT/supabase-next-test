@@ -2,7 +2,7 @@
 <div align="center">Built with the Next.js 15 App Router</div>
 <br />
 <div align="center">
-<a href="http://localhost:3000/">View Demo</a>
+<a href="https://supabase-next-test-seven.vercel.app/">View Demo</a>
 <span>
 </div>
 

@@ -1,7 +1,10 @@
 'use client';
 import { Profile, Roles } from '@/constants/data';
 import { createClient } from '@/utils/supabase/client';
-import { deleteProfileAction, updateProfileAction } from '@/utils/supabase/profile-actions';
+import {
+  deleteProfileAction,
+  updateProfileAction
+} from '@/utils/supabase/profile-actions';
 import { User } from '@supabase/supabase-js';
 import React, { createContext, useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -12,6 +15,7 @@ export interface UserContextType {
   updating: boolean;
   profiles: Profile[];
   fetchProfiles: () => Promise<void>;
+  getCurrentUser: () => Promise<void>;
   updateProfile: (id: string, updatedProfile: Omit<Profile, 'id'>) => void;
   deleteProfile: (id: string) => void;
 }
@@ -30,6 +34,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getCurrentUser = useCallback(async () => {
     try {
+      console.log('------------- getCurrentUser: ', {});
       setLoading(true);
       const supabase = await createClient();
       const {
@@ -57,6 +62,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(currentUser);
     } catch (error) {
       toast.error('Failed to get the current user');
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -85,7 +91,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     async (id: string, data: Omit<Profile, 'id'>) => {
       try {
         setUpdating(true);
-        const updatedProfile = await updateProfileAction(id, data)
+        const updatedProfile = await updateProfileAction(id, data);
 
         if (updatedProfile) {
           setProfiles((oldProfiles) =>
@@ -106,7 +112,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   const deleteProfile = useCallback(async (id: string) => {
     try {
       setUpdating(true);
-      const result = await deleteProfileAction(id)
+      const result = await deleteProfileAction(id);
       if (result)
         setProfiles((oldProfiles) =>
           oldProfiles.filter((item) => item.id !== id)
@@ -120,7 +126,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     getCurrentUser();
-  }, []);
+  }, [getCurrentUser]);
 
   return (
     <UserContext.Provider
@@ -131,7 +137,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
         updating,
         fetchProfiles,
         updateProfile,
-        deleteProfile
+        deleteProfile,
+        getCurrentUser
       }}
     >
       {children}
